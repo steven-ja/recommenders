@@ -1,4 +1,4 @@
-# Copyright 2022 The TensorFlow Recommenders Authors.
+# Copyright 2026 The TensorFlow Recommenders Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -92,7 +92,8 @@ class FactorizedTopK(Factorized):
       self,
       query_embeddings: tf.Tensor,
       true_candidate_embeddings: tf.Tensor,
-      true_candidate_ids: Optional[tf.Tensor] = None
+      true_candidate_ids: Optional[tf.Tensor] = None,
+      sample_weight: Optional[tf.Tensor] = None,
   ) -> tf.Operation:
     """Updates the metrics.
 
@@ -115,6 +116,7 @@ class FactorizedTopK(Factorized):
         by multiplying the candidate and embedding vector. For example, scores
         returned by ScaNN are quantized, and cannot be compared to
         full-precision scores.
+      sample_weight: Optional weighting of each example. Defaults to 1.
 
     Returns:
       Update op. Only used in graph mode.
@@ -129,7 +131,7 @@ class FactorizedTopK(Factorized):
       )
 
     positive_scores = tf.reduce_sum(
-        query_embeddings * true_candidate_embeddings, axis=1, keepdims=True)
+        query_embeddings * true_candidate_embeddings, axis=1, keepdims=True)  # pyrefly: ignore[unsupported-operation]
 
     top_k_predictions, retrieved_ids = self._candidates(
         query_embeddings, k=max(self._ks))
@@ -175,7 +177,7 @@ class FactorizedTopK(Factorized):
             tf.reduce_sum(ids_match[:, :k], axis=1, keepdims=True),
             0.0, 1.0
         )
-        update_ops.append(metric.update_state(match_found))
+        update_ops.append(metric.update_state(match_found, sample_weight))
     else:
       # Score-based evaluation.
       y_pred = tf.concat([positive_scores, top_k_predictions], axis=1)
@@ -187,6 +189,7 @@ class FactorizedTopK(Factorized):
             predictions=y_pred,
             k=k
         )
-        update_ops.append(metric.update_state(top_k_accuracy))
+        update_ops.append(metric.update_state(top_k_accuracy, sample_weight))
 
     return tf.group(update_ops)
+  

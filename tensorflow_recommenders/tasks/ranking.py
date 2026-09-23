@@ -1,4 +1,4 @@
-# Copyright 2022 The TensorFlow Recommenders Authors.
+# Copyright 2026 The TensorFlow Recommenders Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -86,7 +86,7 @@ class Ranking(tf.keras.layers.Layer, base.Task):
       loss: Tensor of loss values.
     """
 
-    loss = self._loss(
+    loss = self._loss(  # pyrefly: ignore[not-callable]
         y_true=labels, y_pred=predictions, sample_weight=sample_weight)
 
     if not compute_metrics:
@@ -108,7 +108,8 @@ class Ranking(tf.keras.layers.Layer, base.Task):
 
     for metric in self._loss_metrics:
       update_ops.append(
-          metric.update_state(loss, sample_weight=sample_weight))
+          metric.update_state(loss)
+      )  # Loss is a scalar here which is already weighted sum
 
     # Custom metrics may not return update ops, unlike built-in
     # Keras metrics.

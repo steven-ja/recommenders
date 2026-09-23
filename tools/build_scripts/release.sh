@@ -5,6 +5,9 @@ set -x
 
 TF_VERSION="2.9.0"
 
+# Use keras-2
+export TF_USE_LEGACY_KERAS=1
+
 GIT_COMMIT_ID=${1:-""}
 [[ -z $GIT_COMMIT_ID ]] && echo "Must provide a commit." && exit 1
 SETUP_ARGS=""
@@ -14,15 +17,11 @@ then
   exit 1
 fi
 
-# Import build functions.
-source ./tools/build_scripts/utils.sh
-
 which python3.10
 python3.10 --version
 
 # Install PyPI-related packages.
-pip install -q --upgrade setuptools pip
-pip install -q wheel twine pyopenssl
+python3.10 -m pip install -q wheel twine pyopenssl
 
 echo "Checking out commit $GIT_COMMIT_ID..."
 git checkout $GIT_COMMIT_ID
@@ -38,9 +37,9 @@ twine check dist/*
 
 # Install and test the distribution
 echo "Running tests..."
-pip install dist/*.whl
-pip install scann
-pip install pytest
+python3.10 -m pip install dist/*.whl
+python3.10 -m pip install scann
+python3.10 -m pip install pytest
 python3.10 -m pytest -v .
 
 # Publish to PyPI

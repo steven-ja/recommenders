@@ -2,10 +2,38 @@
 
 ## [unreleased][unreleased]
 
+## [0.7.6][2025-11-26]
+
+### Changed
+
+-   Add `tf-keras` (Keras 2) to `requirements.txt` and `pip_install.sh`.
+
+## [0.7.5][2025-11-25]
+
+### Changed
+
+-   Updated release test script to use `export TF_USE_LEGACY_KERAS=1`. This is a
+    no-op for the TFRS library but should allow us to push new releases to PyPI.
+
+## [0.7.4][2025-11-04]
+
+### Added
+
+-   Add `tfrs.layers.feature_multiplexing.UnifiedEmbedding` and tutorial.
+
+## [0.7.3][2023-02-02]
+
 ### Changed
 
 -   The `Retrieval` task now accepts a list of factorized metrics instead of a
     single optional metric.
+
+### Added
+
+-   `tfrs.experimental.optimizers.ClippyAdagrad`: a new optimizer based on
+    `tf.keras.optimizers.Adagrad` that is able to improve training stability.
+-   `tfrs.metrics.FactorizedTopK` now accepts sample weights which are used to
+    compute weighted top k metrics.
 
 ## [0.7.2][2022-09-28]
 
